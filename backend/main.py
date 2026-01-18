@@ -1,0 +1,72 @@
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+
+from db import get_db, engine
+from models import Base, ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="Health Check Logging API",
+    description="Backend API for logging frontend-backend connection health checks",
+    version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ✅ Request body for /status logging
+class StatusLogRequest(BaseModel):
+    status: str
+    response_time_ms: float
+
+
+# ✅ 1) HEALTH API (Only returns status)
+@app.get("/health", response_model=HealthCheckResponse, tags=["Health"])
+async def health_check():
+    current_time = get_ist_time()
+
+    return HealthCheckResponse(
+        status="UP",
+        timestamp=current_time.strftime("%Y-%m-%d %H:%M:%S"),
+        timezone="Asia/Kolkata (IST)"
+    )
+
+
+# ✅ 2) STATUS API (Frontend sends response_time_ms here + backend logs it)
+@app.post("/status", response_model=StatusResponse, tags=["Health"])
+async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db)):
+    current_time = get_ist_time()
+
+    # ✅ Save log into DB using REAL response time sent by frontend
+    db_log = ConnectionLog(
+        status=payload.status,
+        response_time_ms=payload.response_time_ms,
+        checked_at=current_time
+    )
+
+    db.add(db_log)
+    db.commit()
+
+    # ✅ Return all logs
+    logs = db.query(ConnectionLog).order_by(ConnectionLog.checked_at.desc()).all()
+
+    return StatusResponse(
+        status="UP",
+        timestamp=current_time.strftime("%Y-%m-%d %H:%M:%S"),
+        timezone="Asia/Kolkata (IST)",
+        logs=logs
+    )
+
+
+# ✅ Run
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
