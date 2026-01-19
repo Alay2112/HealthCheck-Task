@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback} from "react";
 
 function App() {
   const [health, setHealth] = useState(null);
@@ -9,7 +9,7 @@ function App() {
   const API_URL = import.meta.env.VITE_API_URL;
 
   // ✅ Call /health → measure response time → send to /status
-  const checkHealth = async () => {
+  const checkHealth = useCallback(async () => {
     setChecking(true);
     setError("");
 
@@ -40,7 +40,7 @@ function App() {
 
       const statusData = await statusRes.json();
       setLogs(statusData.logs);
-    } catch (_err) {
+    } catch{
       const endTime = performance.now();
       const responseTime = endTime - startTime;
 
@@ -64,13 +64,13 @@ function App() {
 
         const statusData = await statusRes.json();
         setLogs(statusData.logs);
-      } catch (_err) {
+      } catch{
         console.log("Backend completely down, can't log status.");
       }
     } finally {
       setChecking(false);
     }
-  };
+  }, [API_URL]);
 
   // ✅ Load initially
   useEffect(() => {
