@@ -84,14 +84,33 @@ jobs:
          run: npm run lint
 
 
-  # docker:
-  #   name: docker build and version strategy
-  #   runs-on: ubuntu-latest
-  #   needs: lint
+  docker:
+    name: docker build and version strategy
+    runs-on: ubuntu-latest
+    needs: lint
 
-  #   steps:
-  #     - name: checking code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: checking code
+        uses: actions/checkout@v4
 
+      - name: check docker compose file
+        run: docker compose config
+
+      - name: build docker compose file
+        run: docker compose build
+
+      - name: tagging the images
+        run: |
+
+          short_sha=$(echo "$GITHUB_SHA}" | cut -c1-7)
+
+          BACKEND_IMG= backend-img
+          FRONTEND_IMG= frontend-img
+
+          docker tag ${BACKEND_IMG}:latest ${BACKEND_IMG}:${short_sha}
+          docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG}:${short_sha} 
+          
+      - name: Listing docker images
+        run: dokcer images | grep ${BACKEND_IMG}|${FRONTEND_IMG}
 
     

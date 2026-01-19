@@ -16,6 +16,7 @@ services:
     restart: always
   
   backend:
+    image: backend-img
     build: ./backend
     env_file:
     - ./backend/.env
@@ -27,6 +28,7 @@ services:
     restart: always
 
   frontend:
+    image: frontend-img
     build: ./frontend
     ports:
     - "5173:5173"
