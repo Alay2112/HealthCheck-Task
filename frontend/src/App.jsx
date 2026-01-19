@@ -40,7 +40,7 @@ function App() {
 
       const statusData = await statusRes.json();
       setLogs(statusData.logs);
-    } catch (err) {
+    } catch (_err) {
       const endTime = performance.now();
       const responseTime = endTime - startTime;
 
@@ -64,7 +64,7 @@ function App() {
 
         const statusData = await statusRes.json();
         setLogs(statusData.logs);
-      } catch (e) {
+      } catch (_err) {
         console.log("Backend completely down, can't log status.");
       }
     } finally {
@@ -75,8 +75,7 @@ function App() {
   // ✅ Load initially
   useEffect(() => {
     checkHealth();
-  }, []);
-
+  }, [checkHealth]);
   return (
     <div
       style={{
