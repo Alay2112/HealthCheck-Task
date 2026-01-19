@@ -4,3 +4,4 @@ psycopg2-binary==2.9.9
 sqlalchemy==2.0.32
 pytz==2025.2
 python-dotenv==1.0.1
+flake8
