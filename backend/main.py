@@ -21,8 +21,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # ✅ Request body for /status logging
+
+
 class StatusLogRequest(BaseModel):
     status: str
     response_time_ms: float
