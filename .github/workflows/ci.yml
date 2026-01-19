@@ -121,7 +121,7 @@ jobs:
       - name: tagging the images
         run: |
 
-          short_sha=$(echo "{$GITHUB_SHA}" | cut -c1-7)
+          short_sha=$(echo "$GITHUB_SHA" | cut -c1-7)
 
           BACKEND_IMG="backend-img"
           FRONTEND_IMG="frontend-img"
