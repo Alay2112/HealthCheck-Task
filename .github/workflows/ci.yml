@@ -123,8 +123,8 @@ jobs:
 
           short_sha=$(echo "$GITHUB_SHA}" | cut -c1-7)
 
-          BACKEND_IMG= backend-img
-          FRONTEND_IMG= frontend-img
+          BACKEND_IMG= "backend-img"
+          FRONTEND_IMG= "frontend-img"
 
           docker tag ${BACKEND_IMG}:latest ${BACKEND_IMG}:${short_sha}
           docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG}:${short_sha} 
