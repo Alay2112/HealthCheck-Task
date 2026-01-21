@@ -128,6 +128,6 @@ jobs:
           docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG}:${short_sha} 
           
       - name: Listing docker images
-        run: docker images | grep ${BACKEND_IMG}|${FRONTEND_IMG}
+        run: docker images
 
     
