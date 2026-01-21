@@ -1,19 +1,4 @@
 #!/bin/bash
-# ------------------------------------------------------
-# GPU-READY INSTANCE PREPARATION SCRIPT (DOCUMENTATION)
-# ------------------------------------------------------
-# Purpose:
-# Prepare an Ubuntu-based EC2 instance for future GPU- accelerated Docker workloads.
-#
-#
-# Tested target OS:
-# - Ubuntu 20.04 / 22.04
-#
-# Expected EC2 Types:
-# - g4dn.xlarge
-# - g5.xlarge
-# - p3 / p4 series
-# ------------------------------------------------------
 
 set -e
 
