@@ -193,6 +193,6 @@ Health is validated in 3 layers:
 ## Screen Recording
 
 - below is link of screen recording with local build, containers running and health-check working.
-  - [Screen Recording](https://drive.google.com/file/d/1rOhQlL_F3WQ4V4kZCWPN-jUjSrz5b5QK/view?usp=sharing)
+  - [Screen Recording](https://drive.google.com/file/d/1SRzQI1E2KtjmeoSooIKrCzTtbSu06n0F/view?usp=sharing)
 
   
