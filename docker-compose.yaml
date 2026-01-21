@@ -12,11 +12,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-<<<<<<< HEAD
-      - pg_data:/var/lib/postgresql/data
-=======
     - pg_data:/var/lib/postgresql/data
->>>>>>> cbe60fd (README.md)
     restart: always
   
   backend:
@@ -42,7 +38,6 @@ services:
     build: ./frontend
     ports:
     - "5173:5173"
-    - "3000:3000"
     env_file:
     - ./frontend/.env
     depends_on:
@@ -50,9 +45,5 @@ services:
         condition: service_healthy
     restart: always
 
-<<<<<<< HEAD
-    
-=======
->>>>>>> cbe60fd (README.md)
 volumes:
   pg_data:
