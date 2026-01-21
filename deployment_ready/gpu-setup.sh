@@ -3,11 +3,8 @@
 # GPU-READY INSTANCE PREPARATION SCRIPT (DOCUMENTATION)
 # ------------------------------------------------------
 # Purpose:
-# Prepare an Ubuntu-based EC2 instance for future GPU-
-# accelerated Docker workloads.
+# Prepare an Ubuntu-based EC2 instance for future GPU- accelerated Docker workloads.
 #
-# This script is NOT executed as part of this task.
-# It is provided for infrastructure readiness only.
 #
 # Tested target OS:
 # - Ubuntu 20.04 / 22.04
