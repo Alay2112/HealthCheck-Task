@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import text
 
 from db import get_db
-from models import  ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
+from models import ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
 
 # Base.metadata.create_all(bind=engine)
 
@@ -47,6 +47,7 @@ async def health_check(db: Session = Depends(get_db)):
         timestamp=current_time.strftime("%Y-%m-%d %H:%M:%S"),
         timezone="Asia/Kolkata (IST)"
     )
+
 
 # Status API
 @app.post("/status", response_model=StatusResponse, tags=["Health"])
