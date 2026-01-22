@@ -175,7 +175,7 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 
 ### DB Not Reachable
 - Backend depends on Postgres health.
-- Backend returns 503 for DB-related endpoints if DB connection fails
+- Backend returns error if DB connection fails
 - Postgres healthcheck ensures DB readiness
 
 ### Port Conflicts
