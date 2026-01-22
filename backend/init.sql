@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS connection_logs (
+  id SERIAL PRIMARY KEY,
+  status TEXT NOT NULL,
+  response_time_ms DOUBLE PRECISION NOT NULL,
+  checked_at TIMESTAMP NOT NULL
+);

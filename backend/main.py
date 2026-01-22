@@ -1,12 +1,13 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from sqlalchemy import text
 
 from db import get_db, engine
 from models import Base, ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Health Check Logging API",
@@ -30,8 +31,16 @@ class StatusLogRequest(BaseModel):
 
 # Health API
 @app.get("/health", response_model=HealthCheckResponse, tags=["Health"])
-async def health_check():
+async def health_check(db: Session = Depends(get_db)):
     current_time = get_ist_time()
+
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception:
+        raise HTTPException(
+            status_code=503,
+            detail="Database not reachable"
+        )
 
     return HealthCheckResponse(
         status="UP",
@@ -56,7 +65,7 @@ async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db))
     db.commit()
 
     # Return all logs
-    logs = db.query(ConnectionLog).order_by(ConnectionLog.checked_at.desc()).all()
+    logs = db.query(ConnectionLog).order_by(ConnectionLog.checked_at.desc()).limit(10).all()
 
     return StatusResponse(
         status="UP",
