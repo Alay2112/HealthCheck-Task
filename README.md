@@ -134,13 +134,13 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 - Each step depends on the previous one, so if any step fails, the pipeline stops and fails immediately and the remaining steps are skipped.
 
 ### Pipeline Order
-  1. Lint
-    - flake8
-    - eslint
-  2. Build
-    - frontend build runs only if lint passes
-  3. Docker Build and version strategy
-    - Docker images build only if build passes
+1. Lint
+  - flake8
+  - eslint
+2. Build
+  - frontend build runs only if lint passes
+3. Docker Build and version strategy
+  - Docker images build only if build passes
 
 **Failure Behavior**
 - If Lint fails → pipeline fails and Build + Docker Build will NOT run
