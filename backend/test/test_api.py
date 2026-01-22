@@ -4,14 +4,14 @@ from main import app
 client = TestClient(app)
 
 
-def test_health_should_return_200():
+def test_health():
     res = client.get("/health")
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "UP"
 
 
-def test_status_should_return_logs():
+def test_status():
     payload = {"status": "UP", "response_time_ms": 12.5}
 
     res = client.post("/status", json=payload)
