@@ -125,8 +125,10 @@ jobs:
           BACKEND_IMG="backend-img"
           FRONTEND_IMG="frontend-img"
 
-          docker tag ${BACKEND_IMG}:latest ${BACKEND_IMG}:${short_sha} ${BACKEND_IMG}:v1.0.${{github.run_number}} 
-          docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG}:${short_sha} ${BACKEND_IMG}:v1.0.${{github.run_number}}
+          docker tag ${BACKEND_IMG}:latest ${BACKEND_IMG}:${short_sha}
+          docker tag ${BACKEND_IMG}:latest ${BACKEND_IMG}:v1.0.${{github.run_number}} 
+          docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG}:${short_sha} 
+          docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG_IMG}:v1.0.${{github.run_number}} 
           
       - name: Listing docker images
         run: docker images
