@@ -76,7 +76,7 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 ## Backend ↔ Database Contract
 - This application uses PostgreSQL for storing connection logs.
 
-### Database Table Creation
+**Database Table Creation**
 -To ensure the database schema is created automatically, an `init` script is used:
   -File:[`backend/init.sql`](./backend/init.sql)
 
@@ -85,7 +85,7 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 
 - When PostgreSQL starts for the first time, it executes init.sql and creates the `connection_logs` table.
 
-### Backend ↔ DB Behavior
+**Backend ↔ DB Behavior on every call**
 - POST /status
   - Inserts a new record into `connection_logs table`
   - Returns the latest `10(N) logs` from the database
@@ -128,6 +128,24 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 - Tags images with:
   - `latest`
   - The current commit `SHA` (for traceability and rollback readiness)
+
+**CI/CD failure paths**
+- Our CI pipeline is strict and runs in a fixed order.
+- Each step depends on the previous one, so if any step fails, the pipeline stops and fails immediately and the remaining steps are skipped.
+
+### Pipeline Order
+  1. Lint
+    - flake8
+    - eslint
+  2. Build
+    - frontend build runs only if lint passes
+  3. Docker Build and version strategy
+    - Docker images build only if build passes
+
+**Failure Behavior**
+- If Lint fails → pipeline fails and Build + Docker Build will NOT run
+- If Build fails → pipeline fails and Docker Build will NOT run
+- If Docker Build fails → pipeline fails at image build stage
 
 **Failure Handling**
 - The pipeline fails cleanly with clear logs if:
