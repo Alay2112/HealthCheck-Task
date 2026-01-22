@@ -73,6 +73,28 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
   docker compose down
   ```
 
+## Backend ↔ Database Contract
+- This application uses PostgreSQL for storing connection logs.
+
+### Database Table Creation
+-To ensure the database schema is created automatically, an `init` script is used:
+  -File:[`backend/init.sql`](./backend/init.sql)
+
+- Mounted in `docker-compose.yml` under `postgres` service:
+  - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+- When PostgreSQL starts for the first time, it executes init.sql and creates the `connection_logs` table.
+
+### Backend ↔ DB Behavior
+- POST /status
+  - Inserts a new record into `connection_logs table`
+  - Returns the latest `10(N) logs` from the database
+
+- GET /health
+  - Returns `200 OK` if DB is reachable
+  - Returns `503 Service Unavailable` if DB is unreachable
+  - This ensures that `/health` will fail gracefully if DB is unreachable
+
 
 ## CI/CD Pipeline
 

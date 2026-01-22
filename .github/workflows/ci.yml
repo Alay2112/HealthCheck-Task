@@ -128,7 +128,7 @@ jobs:
           docker tag ${BACKEND_IMG}:latest ${BACKEND_IMG}:${short_sha}
           docker tag ${BACKEND_IMG}:latest ${BACKEND_IMG}:v1.0.${{github.run_number}} 
           docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG}:${short_sha} 
-          docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG_IMG}:v1.0.${{github.run_number}} 
+          docker tag ${FRONTEND_IMG}:latest ${FRONTEND_IMG}:v1.0.${{github.run_number}} 
           
       - name: Listing docker images
         run: docker images
