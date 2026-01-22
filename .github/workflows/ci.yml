@@ -91,7 +91,7 @@ jobs:
       - name: checking code
         uses: actions/checkout@v4
 
-      - name: postgres' .env
+      - name: postgres's .env
         run: |
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
