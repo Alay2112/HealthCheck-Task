@@ -7,13 +7,8 @@ from sqlalchemy import text
 from db import get_db
 from models import ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
 
-# Base.metadata.create_all(bind=engine)
 
-app = FastAPI(
-    title="Health Check Logging API",
-    description="Backend API for logging frontend-backend connection health checks",
-    version="1.0.0"
-)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
