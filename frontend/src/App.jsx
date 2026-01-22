@@ -1,8 +1,5 @@
 import { useEffect, useState, useCallback} from "react";
 
-const unusedVar = 123;
-
-
 function App() {
   const [health, setHealth] = useState(null);
   const [logs, setLogs] = useState([]);
