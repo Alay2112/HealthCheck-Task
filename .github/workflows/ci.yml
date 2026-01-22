@@ -106,7 +106,6 @@ jobs:
 
       - name: running test for backend
         run: |
-          cd backend
           pytest -q
 
 
