@@ -88,6 +88,21 @@ jobs:
     name: backend test
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        images: postgres:16
+        env:
+          POSTGRES_USER=${{ secrets.DB_USER }}
+          POSTGRES_NAME=${{ secrets.DB_NAME }}
+          POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}
+        ports:
+        - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }}
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: checking code
         uses: actions/checkout@v4
