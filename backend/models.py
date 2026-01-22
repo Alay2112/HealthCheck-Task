@@ -7,7 +7,7 @@ import pytz
 Base = declarative_base()
 
 
-# ✅ DB Table
+# DB Table
 class ConnectionLog(Base):
     __tablename__ = "connection_logs"
 
@@ -17,7 +17,7 @@ class ConnectionLog(Base):
     checked_at = Column(DateTime, nullable=False)
 
 
-# ✅ Response Models
+# Response Models
 class HealthCheckResponse(BaseModel):
     status: str
     timestamp: str

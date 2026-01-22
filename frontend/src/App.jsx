@@ -8,7 +8,7 @@ function App() {
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  // ✅ Call /health → measure response time → send to /status
+  // measuring and sending response time to /health
   const checkHealth = useCallback(async () => {
     setChecking(true);
     setError("");
@@ -24,9 +24,8 @@ function App() {
 
       setHealth(data);
 
-      console.log(`✅ Health OK: ${Math.round(responseTime)}ms`);
+      console.log(`Health OK: ${Math.round(responseTime)}ms`);
 
-      // ✅ Send response time to backend using /status API
       const statusRes = await fetch(`${API_URL}/status`, {
         method: "POST",
         headers: {
@@ -49,7 +48,6 @@ function App() {
 
       console.log(`❌ Health Failed: ${Math.round(responseTime)}ms`);
 
-      // ✅ Even log DOWN into backend
       try {
         const statusRes = await fetch(`${API_URL}/status`, {
           method: "POST",
@@ -72,7 +70,7 @@ function App() {
     }
   }, [API_URL]);
 
-  // ✅ Load initially
+  // Load initially
   useEffect(() => {
     checkHealth();
   }, [checkHealth]);
@@ -96,7 +94,7 @@ function App() {
         Health Check Logger
       </h1>
 
-      {/* ✅ Health Status */}
+      {/* health status */}
       <div
         style={{
           background: "#f5f5f5",
@@ -151,7 +149,7 @@ function App() {
         </button>
       </div>
 
-      {/* ✅ Logs Table */}
+      {/* logs table */}
       <div style={{ background: "#f5f5f5", padding: "20px", borderRadius: "5px" }}>
         <h2 style={{ marginBottom: "15px" }}>Connection Logs</h2>
 
