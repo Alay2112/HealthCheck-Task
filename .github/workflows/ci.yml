@@ -106,6 +106,7 @@ jobs:
 
       - name: running test for backend
         run: |
+          pwd
           pytest -q
 
 
