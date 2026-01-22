@@ -127,7 +127,7 @@ jobs:
           pip install pytest httpx
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-          PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -f backend/db/init.sql
+          PGPASSWORD=testpass psql -h localhost -U testuser -d testdb -f backend/init.sql
 
       - name: running test for backend
         run: |
