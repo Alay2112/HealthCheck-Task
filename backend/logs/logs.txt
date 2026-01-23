@@ -1,0 +1,2 @@
+INFO:startup:{"level": "INFO", "message": "Backend server started!"}
+INFO:startup:{"level": "INFO", "message": "Database Connection Successful!"}

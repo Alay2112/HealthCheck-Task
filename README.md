@@ -95,9 +95,23 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
   - Returns `503 Service Unavailable` if DB is unreachable
   - This ensures that `/health` will fail gracefully if DB is unreachable
 
+## Observability & Failure Simulation
+
+**How To Observe**
+- Run Backend and see `terminal` or `./logs/logs.txt` file to see the logs.
+- Backend prints the structured logs for:
+  - Backend Startup
+  - Database Connection Status
+  - Request lifecycle (request started → completed with status_code + duration(ms))
+
+**Failure Simulation**
+- Backend supports failure simulation using `environment flags` to test observability and error handling.
+- Two flags are available in the `.env` file:
+  1. `SIMULATE_DB_DOWN` → simulates database unavailability (`/health` returns `503`)
+  2. `SIMULATE_CRASH` → simulates a backend crash
+- To simulate failures, set either (or both) flags to `true` and `restart` the backend.
 
 ## CI/CD Pipeline
-
 - Automated GitHub Actions for code quality and Docker image preparation whenever any changes are made into the `main` branch.
 
 **Pipeline Flow**
