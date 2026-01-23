@@ -11,7 +11,7 @@ import json
 import time
 
 # Simulation failure objects
-SIMULATE_DB_DOWN = os.getenv("SIMULATE_DB_DOWN", "false").lower() =="true"
+SIMULATE_DB_DOWN = os.getenv("SIMULATE_DB_DOWN", "false").lower() == "true"
 SIMULATE_CRASH = os.getenv("SIMULATE_CRASH", "false").lower() == "true"
 
 # log objects
@@ -87,7 +87,7 @@ async def health_check(db: Session = Depends(get_db)):
 
     if SIMULATE_DB_DOWN:
         failure_log.warning(json.dumps({"level": "WARNING", "message": "SIMULATE_DB_DOWN enabled"}))
-        raise HTTPException(status_code = 503, detail = "Simulate DB failure!")
+        raise HTTPException(status_code=503, detail="Simulate DB failure!")
 
     try:
         db.execute(text("SELECT 1"))
