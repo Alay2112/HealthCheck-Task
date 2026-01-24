@@ -35,11 +35,11 @@ echo "Cloning GitHub repo to /home/ubuntu/HealthCheck-Task"
 if [ -d "$APP_DIR" ]; then
   echo "App directory already exists. Pulling latest changes..."
   cd "$APP_DIR"
-  sudo git fetch origin
-  sudo git checkout main
-  sudo git pull origin main
+  git fetch origin
+  git checkout main
+  git pull origin main
 else
-  sudo git clone -b main "$REPO_URL" "$APP_DIR"
+  git clone -b main "$REPO_URL" "$APP_DIR"
   cd "$APP_DIR"
 fi
 
@@ -54,15 +54,15 @@ if [ -f "./frontend/.env.example" ] && [ ! -f "./frontend/.env" ]; then
   echo "frontend/.env is created and copied content from ./frontend/.env.example"
 fi
 
-if [ -f "./.env.example"] && [! -f "./.env"]; then
-   sudo cp ./env.example ./.env
+if [ -f "./.env.example"] && [ ! -f "./.env"]; then
+   sudo cp ./.env.example ./.env
    echo ".env is created and copied content from .env.example"
 
 echo "Edit .env files if needed before running production traffic"
 
 echo "using docker compose, containers are being started"
 sudo docker compose down || true
-sudo docker compose build --no-cache
+sudo docker compose build
 sudo docker compose up -d
 
 echo "Checking running containers"

@@ -1,15 +1,19 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
-echo "Checking for NVIDIA GPU already exist in system"
-lspci | grep -i nvidia || echo "No NVIDIA GPU detected"
-#if not then, installing the nvidia drivers
+echo "Checking for NVIDIA GPU on this machine..."
+if ! lspci | grep -i nvidia; then
+  echo "No NVIDIA GPU detected. Skipping driver + toolkit installation."
+  exit 0
+fi
 
 sudo apt update
 
 echo "Installing NVIDIA drivers"
-sudo apt install -y nvidia-driver-535
+# here since nvidia-driver-535 may not exist in all ubuntu versions so I'm using autoinstall
+sudo apt-get install -y ubuntu-drivers-common
+sudo ubuntu-drivers autoinstall
 
 #after installation of any drivers there is system reboot needed so do a reboot after completing last step
 
@@ -26,6 +30,7 @@ sudo apt update
 sudo apt install -y nvidia-container-toolkit
 
 echo "Restarting Docker Service"
+sudo systemctl daemon-reload
 sudo systemctl restart docker
 
-nvidia-smi #to validate the installation after system reboot
+#run 'nvidia-smi' command to validate the installation after system reboot
