@@ -4,8 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from sqlalchemy import text
-from db.db import get_db
-from db.models import ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
+from backend.db.db import get_db
+from backend.db.models import ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
 import logging
 import json
 import time
