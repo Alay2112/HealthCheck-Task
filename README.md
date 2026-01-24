@@ -142,6 +142,10 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 - Tags images with:
   - `latest`
   - The current commit `SHA` (for traceability and rollback readiness)
+  - v1.0.${{github.run_number}}
+
+- So, built docker images are tagged by commit hash + version tag.
+- `Version tag` is the number time pipeline is running which can be seen at GitHub's `Actions` section so `rollback` to previous healthy image is much easier and simple by this.
 
 **CI/CD failure paths**
 - Our CI pipeline is strict and runs in a fixed order.
@@ -179,15 +183,27 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 - EC2 Configuration for GPU-accelerated Docker workloads:
   - Target OS: Ubuntu `20.04` / `22.04`
   - Instance types: `g4dn.xlarge`, `g5.xlarge`, `p3/p4 series`
+-  Before running this scripts for EC2 readiness and GPU Setup, make them executable by below command:
+   ```
+   chmod +x deployment_scripts/*.sh
+   ```
 
 1. **EC2 Deployment Script**
-- [`deployment_ready/aws-ec2.sh`](./deployment_ready/aws-ec2.sh)
+- [`deployment_scripts/aws-ec2.sh`](./deployment_scripts/aws-ec2.sh)
+- to run this script, run command below:
+  ```
+  bash <path/of/EC2/Prep/Script.sh>
+  ```
 
 2. **GPU Setup Script**
-- [`deployment_ready/gpu-setup.sh`](./deployment_ready/gpu-setup.sh)
+- [`deployment_scripts/gpu-setup.sh`](./deployment_scripts/gpu-setup.sh)
+- to run this script, run command below:
+  ```
+  bash <path/of/GPU/Setup/Script.sh>
+  ```
 
 3. **NGINX Reverse Proxy**
-- [`deployment_ready/nginx.config`](./deployment_ready/nginx.config)
+- [`deployment_scripts/NGINX/nginx.config`](./deployment_scripts/NGINX/nginx.config)
 
 ## Zero-Downtime Restart Strategy
 - There are healthchecks and restart policies included inside `docker-compose.yaml` to ensure safe restarts with minimal downtime.
@@ -199,7 +215,11 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
   - All containers use `restart: always` for auto recovery
 - We can also restart a single container with minimal downtime by,
   ```
-  docker compose up -d --no-deps backend/frontend/postgres
+  # restart backend with minimal downtime
+  docker compose up -d --no-deps backend
+
+  #for checking the restart time details
+  curl "http://localhost:8000/health"
 
   ```
 
@@ -209,16 +229,46 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 ### How rollback works
 - Every build produces a Docker image which will be stored locally in Docker engine.
 - Images can be tagged with:
-  - `latest` (current version) & a unique version tag
+  - `latest` (current version), a unique `commit hash` and `version tag`
 
 ### Steps for rollbacking previous image
   ```
-  docker pull "image_name(backend/frontend)":"tag of previous image you want to rollback"
-  docker compose down 
-  docker compose up -d
-  ``` 
-  - Here, after pulling old version restart is important.
+  # for pulling the previous healthy image version
+  # Suppose xyz= previous healthy image's tag
+  docker pull frontend:xyz
+  docker pull backend:xyz
 
+  #for rollbacking to that previous version
+  docker tag frontend:xyz frontend:latest
+  docker tag backend:xyz backend:latest
+
+  # To restart the image containers with minimal downtime
+  docker compose up -d --no-deps backend
+  docker compose up -d --no-deps frontend
+
+  #check if it worked or not by
+  curl "http://localhost:8000/health"
+  docker compose ps
+
+  ``` 
+  ### Steps for rollbacking previous compose state
+  - By running command `git log --oneline` we can print previous commits with its `unique <PREVIOUS_COMMIT_HASH>`.
+  - by using `<PREVIOUS_COMMIT_HASH>` we can restore `docker-compose.yaml`.
+
+  ```
+  #find docker-compose.yaml file's previous commit's hash from,
+  git log --oneline
+
+  # Rollback docker-compose.yaml to previous known-good version
+  git checkout <PREVIOUS_COMMIT_HASH> docker-compose.yaml
+
+  # Apply the previous compose state
+  docker compose up -d
+
+  #Verify it
+  docker compose ps
+  curl "http://localhost:8000/health"
+  ```
 
 ## Failure Handling
 
@@ -248,5 +298,3 @@ Health is validated in 3 layers:
 
 - below is link of screen recording with local build, containers running and health-check working.
   - [Screen Recording](https://drive.google.com/file/d/1SRzQI1E2KtjmeoSooIKrCzTtbSu06n0F/view?usp=sharing)
-
-  
