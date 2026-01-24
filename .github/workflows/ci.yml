@@ -87,12 +87,13 @@ jobs:
     name: backend test
     runs-on: ubuntu-latest
     needs: build
+    
     env:
       DB_HOST: localhost
       DB_NAME: test
       DB_USER: test
       DB_PASSWORD: test
-      DB_PORT: test
+      DB_PORT: 5432
 
     steps:
       - name: checking code
