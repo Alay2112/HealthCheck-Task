@@ -84,7 +84,7 @@ jobs:
 
 
   test:
-    name: backend test
+    name: Test
     runs-on: ubuntu-latest
     needs: build
 
@@ -125,7 +125,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: running test for backend
+      - name: running test
         run: |
           python -m pytest -q
 

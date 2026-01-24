@@ -137,7 +137,13 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
 - Installs frontend dependencies (Node.js)
 - Builds the frontend application to ensure it compiles successfully
 
-3. **Docker Image Build & Image tagging**
+3. **Test**
+- Runs a Postgres service for backend DB readiness.
+- Installs backend dependencies.
+- Runs a basic FastAPI test for the `/health` endpoint.
+- `/status` is DB-dependent, so CI focuses on `/health` endpoint validation.
+
+4. **Docker Image Build & Image tagging**
 - Builds Docker images using docker compose build
 - Tags images with:
   - `latest`
@@ -157,7 +163,9 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
     - eslint
 2. Build
     - frontend build runs only if lint passes
-3. Docker Build and version strategy
+3. Test
+    - Test runs only if build passes
+4. Docker Build and version strategy
     - Docker images build only if build passes
 
 **Failure Behavior**
