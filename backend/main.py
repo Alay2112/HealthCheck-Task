@@ -16,10 +16,7 @@ SIMULATE_CRASH = os.getenv("SIMULATE_CRASH", "false").lower() == "true"
 
 # log objects
 logging.basicConfig(level=logging.INFO,
-                    handlers=[
-                        logging.StreamHandler(),
-                        logging.FileHandler('./logs/logs.txt')
-                        ],
+                    handlers=[logging.StreamHandler()],
                     )
 
 logger_1 = logging.getLogger("/health")
