@@ -3,10 +3,12 @@ from main import app
 
 client = TestClient(app)
 
+
 def test_health_returns_200():
     response = client.get("/health")
     assert response.status_code == 200
-    
+
+
 def test_status():
     payload = {"status": "UP", "response_time_ms": 12.5}
 
