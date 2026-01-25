@@ -129,8 +129,7 @@ async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db))
         db.commit()
         db.refresh(db_log)
 
-
-    # Return all logs
+        # Return all logs
         logs = db.query(ConnectionLog).order_by(ConnectionLog.checked_at.desc()).limit(10).all()
 
         logger_2.info(json.dumps({'level': 'INFO', 'message': 'Status logs posted into table successfully'}))
