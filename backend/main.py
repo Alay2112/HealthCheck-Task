@@ -60,6 +60,11 @@ async def startup_event():
         raise RuntimeError('Backend crashed!')
 
     db = SessionLocal()
+
+    if SIMULATE_DB_DOWN:
+        failure_log.warning(json.dumps({"level": "WARNING", "message": "SIMULATE_DB_DOWN enabled"}))
+        raise HTTPException(status_code=503, detail="Simulate DB failure!")
+    
     try:
         db.execute(text("SELECT 1"))
         startup_log.info(json.dumps({'level': 'INFO', 'message': 'Database Connection Successful!'}))
@@ -92,10 +97,6 @@ async def request_logs(request, call_next):
 @app.get("/health", response_model=HealthCheckResponse, tags=["Health"])
 async def health_check(db: Session = Depends(get_db)):
     current_time = get_ist_time()
-
-    if SIMULATE_DB_DOWN:
-        failure_log.warning(json.dumps({"level": "WARNING", "message": "SIMULATE_DB_DOWN enabled"}))
-        raise HTTPException(status_code=503, detail="Simulate DB failure!")
 
     try:
         db.execute(text("SELECT 1"))
