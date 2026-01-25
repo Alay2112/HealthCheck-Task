@@ -1,15 +1,13 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
-from sqlalchemy.orm import declarative_base
+from db.db import Base
 from pydantic import BaseModel
 from datetime import datetime
 import pytz
 
-Base = declarative_base()
-
 
 # DB Table
 class ConnectionLog(Base):
-    __tablename__ = "connection_logs"
+    __tablename__ = "status_logs"
 
     id = Column(Integer, primary_key=True, index=True)
     status = Column(String, nullable=False)

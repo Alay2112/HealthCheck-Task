@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS connection_logs (
+CREATE TABLE IF NOT EXISTS status_logs (
   id SERIAL PRIMARY KEY,
   status TEXT NOT NULL,
   response_time_ms DOUBLE PRECISION NOT NULL,

@@ -4,11 +4,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from sqlalchemy import text
-from backend.db.db import get_db
-from backend.db.models import ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
+from db.db import get_db, SessionLocal, Base, engine
+from db.models import ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
 import logging
 import json
 import time
+
+Base.metadata.create_all(bind=engine)
+
+db = SessionLocal()
+try:
+    db.execute(text("SELECT 1"))
+finally:
+    db.close()
+
 
 # Simulation failure objects
 SIMULATE_DB_DOWN = os.getenv("SIMULATE_DB_DOWN", "false").lower() == "true"
@@ -50,12 +59,14 @@ async def startup_event():
         startup_log.warning(json.dumps({'level': 'WARNING', 'message': 'Backend is crashed and going down...'}))
         raise RuntimeError('Backend crashed!')
 
+    db = SessionLocal()
     try:
-        db = next(get_db())
         db.execute(text("SELECT 1"))
         startup_log.info(json.dumps({'level': 'INFO', 'message': 'Database Connection Successful!'}))
     except Exception as e:
         startup_log.error(json.dumps({'level': 'ERROR', 'message': f'Database Connection Failed! : {e}'}))
+    finally:
+        db.close()
 
 
 # Request life cycle
@@ -116,6 +127,8 @@ async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db))
 
         db.add(db_log)
         db.commit()
+        db.refresh(db_log)
+
 
     # Return all logs
         logs = db.query(ConnectionLog).order_by(ConnectionLog.checked_at.desc()).limit(10).all()
