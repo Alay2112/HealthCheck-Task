@@ -197,21 +197,21 @@ React + FastAPI + Postgres based web application with Docker Compose orchestrati
    ```
 
 1. **EC2 Deployment Script**
-- [`deployment_scripts/aws-ec2.sh`](./deployment_scripts/aws-ec2.sh)
+- [`deployment_scripts/aws-ec2.sh`](./scripts/aws-ec2.sh)
 - to run this script, run command below:
   ```
   bash <path/of/EC2/Prep/Script.sh>
   ```
 
 2. **GPU Setup Script**
-- [`deployment_scripts/gpu-setup.sh`](./deployment_scripts/gpu-setup.sh)
+- [`deployment_scripts/gpu-setup.sh`](./scripts/gpu-setup.sh)
 - to run this script, run command below:
   ```
   bash <path/of/GPU/Setup/Script.sh>
   ```
 
 3. **NGINX Reverse Proxy**
-- [`deployment_scripts/NGINX/nginx.config`](./deployment_scripts/NGINX/nginx.config)
+- [`deployment_scripts/NGINX/nginx.config`](./scripts/NGINX/nginx.config)
 
 ## Zero-Downtime Restart Strategy
 - There are healthchecks and restart policies included inside `docker-compose.yaml` to ensure safe restarts with minimal downtime.
