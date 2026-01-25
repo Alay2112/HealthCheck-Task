@@ -126,6 +126,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: running test
+      - working-directory: backend
         run: |
           python -m pytest -q
 
