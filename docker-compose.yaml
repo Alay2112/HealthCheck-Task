@@ -17,7 +17,7 @@ services:
     restart: always
   
   backend:
-    image: alaypatel212/backend-img:${VERSION}
+    image: backend-img
     build: ./backend
     env_file:
     - ./backend/.env
@@ -34,7 +34,7 @@ services:
     restart: always
 
   frontend:
-    image: alaypatel212/frontend-img:${VERSION}
+    image: frontend-img
     build: ./frontend
     ports:
     - "5173:5173"
