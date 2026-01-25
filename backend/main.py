@@ -64,7 +64,7 @@ async def startup_event():
     if SIMULATE_DB_DOWN:
         failure_log.warning(json.dumps({"level": "WARNING", "message": "SIMULATE_DB_DOWN enabled"}))
         raise HTTPException(status_code=503, detail="Simulate DB failure!")
-    
+
     try:
         db.execute(text("SELECT 1"))
         startup_log.info(json.dumps({'level': 'INFO', 'message': 'Database Connection Successful!'}))
