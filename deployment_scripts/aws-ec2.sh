@@ -54,9 +54,10 @@ if [ -f "./frontend/.env.example" ] && [ ! -f "./frontend/.env" ]; then
   echo "frontend/.env is created and copied content from ./frontend/.env.example"
 fi
 
-if [ -f "./.env.example"] && [ ! -f "./.env"]; then
+if [ -f "./.env.example" ] && [ ! -f "./.env"]; then
    sudo cp ./.env.example ./.env
    echo ".env is created and copied content from .env.example"
+fi
 
 echo "Edit .env files if needed before running production traffic"
 
