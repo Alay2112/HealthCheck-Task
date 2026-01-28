@@ -4,13 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from sqlalchemy import text
-from db.db import get_db, SessionLocal, Base, engine
+from db.db import get_db, SessionLocal
 from db.models import ConnectionLog, HealthCheckResponse, StatusResponse, get_ist_time
 import logging
 import json
 import time
 
-# Base.metadata.create_all(bind=engine)
 
 # Simulation failure objects
 SIMULATE_DB_DOWN = os.getenv("SIMULATE_DB_DOWN", "false").lower() == "true"
@@ -46,28 +45,28 @@ class StatusLogRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
 
-    app.state.request_count= 0
-    app.state.failed_request_count= 0
+    app.state.request_count = 0
+    app.state.failed_request_count = 0
 
     startup_log.info(json.dumps({'level': 'INFO', 'message': 'Backend server starting...'}))
 
     if SIMULATE_CRASH:
         startup_log.warning(json.dumps({'level': 'WARNING', 'message': 'Backend is crashed and going down...'}))
         raise RuntimeError('Backend crashed intentionally!')
-    
+
     db = SessionLocal()
 
-    try :
+    try:
         db.execute(text("SELECT 1"))
         startup_log.info(json.dumps({'level': 'INFO', 'message': 'DB connection verified!'}))
         startup_log.info(json.dumps({'level': 'INFO', 'message': 'Backend server started!'}))
-    
+
     except Exception as e:
         startup_log.error(json.dumps({'level': 'ERROR', 'message': f'Backend startup failed!: {e}'}))
-        raise RuntimeError("Startup aborted due to DB failure") 
+        raise RuntimeError("Startup aborted due to DB failure")
 
     finally:
-        db.close()   
+        db.close()
 
 
 # Request life cycle
@@ -80,7 +79,7 @@ async def request_logs(request, call_next):
                               'message': f'Request Started: {request.method}, {request.url.path}'}))
 
     response = await call_next(request)
-    
+
     if response.status_code >= 400:
         app.state.failed_request_count += 1
 
@@ -121,12 +120,12 @@ async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db))
         db.execute(text("SET statement_timeout = 1000"))
         db.execute(text("SELECT 1"))
     except Exception as e:
-        logger_1.error(json.dumps({'level':'ERROR','message':f'DB connection failed!! : {e}'}))
+        logger_1.error(json.dumps({'level': 'ERROR', 'message': f'DB connection failed!!: {e}'}))
         raise HTTPException(
             status_code=503,
             detail="Database not reachable!"
             )
-    
+
     try:
         # Save log into DB using REAL response time sent by frontend
         db_log = ConnectionLog(
@@ -158,12 +157,12 @@ async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db))
         )
 
 
-#endpoint for counter Optional
+# Endpoint for counter Optional
 @app.get("/metrics")
 def metrics():
     return {
-        "TOTAL REQUESTS":app.state.request_count,
-        "FAILED REQUESTS":app.state.failed_request_count
+        "TOTAL REQUESTS": app.state.request_count,
+        "FAILED REQUESTS": app.state.failed_request_count
     }
 
 
