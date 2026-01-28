@@ -10,14 +10,7 @@ import logging
 import json
 import time
 
-Base.metadata.create_all(bind=engine)
-
-db = SessionLocal()
-try:
-    db.execute(text("SELECT 1"))
-finally:
-    db.close()
-
+# Base.metadata.create_all(bind=engine)
 
 # Simulation failure objects
 SIMULATE_DB_DOWN = os.getenv("SIMULATE_DB_DOWN", "false").lower() == "true"
@@ -28,8 +21,7 @@ logging.basicConfig(level=logging.INFO,
                     handlers=[logging.StreamHandler()],
                     )
 
-logger_1 = logging.getLogger("/health")
-logger_2 = logging.getLogger("/status")
+logger_1 = logging.getLogger("/status")
 startup_log = logging.getLogger("startup")
 failure_log = logging.getLogger("simulate-failure")
 api_logs = logging.getLogger("request")
@@ -54,35 +46,43 @@ class StatusLogRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
 
-    startup_log.info(json.dumps({'level': 'INFO', 'message': 'Backend server started!'}))
+    app.state.request_count= 0
+    app.state.failed_request_count= 0
+
+    startup_log.info(json.dumps({'level': 'INFO', 'message': 'Backend server starting...'}))
+
     if SIMULATE_CRASH:
         startup_log.warning(json.dumps({'level': 'WARNING', 'message': 'Backend is crashed and going down...'}))
-        raise RuntimeError('Backend crashed!')
-
+        raise RuntimeError('Backend crashed intentionally!')
+    
     db = SessionLocal()
 
-    if SIMULATE_DB_DOWN:
-        failure_log.warning(json.dumps({"level": "WARNING", "message": "SIMULATE_DB_DOWN enabled"}))
-        raise HTTPException(status_code=503, detail="Simulate DB failure!")
-
-    try:
+    try :
         db.execute(text("SELECT 1"))
-        startup_log.info(json.dumps({'level': 'INFO', 'message': 'Database Connection Successful!'}))
+        startup_log.info(json.dumps({'level': 'INFO', 'message': 'DB connection verified!'}))
+        startup_log.info(json.dumps({'level': 'INFO', 'message': 'Backend server started!'}))
+    
     except Exception as e:
-        startup_log.error(json.dumps({'level': 'ERROR', 'message': f'Database Connection Failed! : {e}'}))
+        startup_log.error(json.dumps({'level': 'ERROR', 'message': f'Backend startup failed!: {e}'}))
+        raise RuntimeError("Startup aborted due to DB failure") 
+
     finally:
-        db.close()
+        db.close()   
 
 
 # Request life cycle
 @app.middleware("http")
 async def request_logs(request, call_next):
+    app.state.request_count += 1
     start = time.time()
 
     api_logs.info(json.dumps({'level': 'INFO',
                               'message': f'Request Started: {request.method}, {request.url.path}'}))
 
     response = await call_next(request)
+    
+    if response.status_code >= 400:
+        app.state.failed_request_count += 1
 
     duration = round((time.time()-start)*1000, 2)
 
@@ -95,16 +95,8 @@ async def request_logs(request, call_next):
 
 # Health API
 @app.get("/health", response_model=HealthCheckResponse, tags=["Health"])
-async def health_check(db: Session = Depends(get_db)):
+async def health_check():
     current_time = get_ist_time()
-
-    try:
-        db.execute(text("SELECT 1"))
-    except Exception:
-        raise HTTPException(
-            status_code=503,
-            detail="Database not reachable!"
-        )
 
     return HealthCheckResponse(
         status="UP",
@@ -118,6 +110,23 @@ async def health_check(db: Session = Depends(get_db)):
 async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db)):
     current_time = get_ist_time()
 
+    if SIMULATE_DB_DOWN:
+        failure_log.warning(json.dumps({"level": "WARNING", "message": "SIMULATE_DB_DOWN enabled"}))
+        raise HTTPException(
+            status_code=503,
+            detail="Simulate DB failure!"
+            )
+
+    try:
+        db.execute(text("SET statement_timeout = 1000"))
+        db.execute(text("SELECT 1"))
+    except Exception as e:
+        logger_1.error(json.dumps({'level':'ERROR','message':f'DB connection failed!! : {e}'}))
+        raise HTTPException(
+            status_code=503,
+            detail="Database not reachable!"
+            )
+    
     try:
         # Save log into DB using REAL response time sent by frontend
         db_log = ConnectionLog(
@@ -133,7 +142,7 @@ async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db))
         # Return all logs
         logs = db.query(ConnectionLog).order_by(ConnectionLog.checked_at.desc()).limit(10).all()
 
-        logger_2.info(json.dumps({'level': 'INFO', 'message': 'Status logs posted into table successfully'}))
+        logger_1.info(json.dumps({'level': 'INFO', 'message': 'Status logs posted into table successfully'}))
 
         return StatusResponse(
             status="UP",
@@ -142,11 +151,20 @@ async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db))
             logs=logs
         )
     except Exception as e:
-        logger_2.error(json.dumps({'level': 'ERROR', 'message': f'Error while posting data into table: {e}'}))
+        logger_1.error(json.dumps({'level': 'ERROR', 'message': f'Error while posting data into table: {e}'}))
         raise HTTPException(
-            status_code=500,
+            status_code=503,
             detail="Failed to save status logs"
         )
+
+
+#endpoint for counter Optional
+@app.get("/metrics")
+def metrics():
+    return {
+        "TOTAL REQUESTS":app.state.request_count,
+        "FAILED REQUESTS":app.state.failed_request_count
+    }
 
 
 if __name__ == "__main__":
