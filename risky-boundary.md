@@ -4,6 +4,6 @@
 - Proprietary data paths
 - Authentication and authorization logic
 
-####Reason:
+#### Reason:
 These areas directly impact product correctness  data integrity, and security, and are outside the DevOps
 integration scope.
