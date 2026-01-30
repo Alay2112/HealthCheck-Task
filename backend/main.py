@@ -86,13 +86,21 @@ async def request_logs(request, call_next):
     duration = round((time.time()-start)*1000, 2)
 
     if response.status_code >= 500:
-        api_logs.error(json.dumps({'level': 'ERROR', 'message': f'Request Failed: {request.method}, {request.url.path}', 'status_code': response.status_code}))
+        api_logs.error(json.dumps({'level': 'ERROR',
+                                   'message': f'Request Failed: {request.method},{request.url.path}',
+                                   'status_code': response.status_code}))
 
     elif response.status_code >= 400:
-        api_logs.warning(json.dumps({'level': 'WARNING', 'message': 'dependency error', 'path': request.url.path, 'status_code': response.status_code}))
+        api_logs.warning(json.dumps({'level': 'WARNING',
+                                     'message': 'dependency error',
+                                     'path': request.url.path,
+                                     'status_code': response.status_code}))
 
     else:
-        api_logs.info(json.dumps({'level': 'INFO', 'message': f'Request completed: {request.method}, {request.url.path}', 'status_code': response.status_code, 'duration_ms': duration}))
+        api_logs.info(json.dumps({'level': 'INFO',
+                                  'message': f'Request completed: {request.method},{request.url.path}',
+                                  'status_code': response.status_code,
+                                  'duration_ms': duration}))
     return response
 
 

@@ -36,8 +36,8 @@ def get_db():
             db.execute(text("SELECT 1"))
             yield db
             return
-        except OperationalError as e:
+        except OperationalError:
             db.close()
             if attempt == retries - 1:
-                raise
+                raise 
             time.sleep(2)
