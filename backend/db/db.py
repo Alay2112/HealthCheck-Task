@@ -39,5 +39,5 @@ def get_db():
         except OperationalError:
             db.close()
             if attempt == retries - 1:
-                raise 
+                raise
             time.sleep(2)
