@@ -17,6 +17,7 @@ function App() {
 
     try {
       const res = await fetch(`${API_URL}/health`);
+      if (!res.ok) throw new Error("Health check failed");
       const data = await res.json();
 
       const endTime = performance.now();
@@ -37,8 +38,15 @@ function App() {
         }),
       });
 
+      if (!statusRes.ok) {
+         setError("Backend is running but DataBase is not reachable!!");
+         setLogs([]);
+         setHealth(null)
+         return;
+      }
+
       const statusData = await statusRes.json();
-      setLogs(statusData.logs);
+      setLogs(statusData.logs || []);
     } catch{
       const endTime = performance.now();
       const responseTime = endTime - startTime;
@@ -60,8 +68,14 @@ function App() {
           }),
         });
 
+        if (!statusRes.ok){
+          setLogs([]);
+          return;
+        }
+
         const statusData = await statusRes.json();
-        setLogs(statusData.logs);
+        setLogs(statusData.logs || []);
+
       } catch{
         console.log("Backend completely down, can't log status.");
       }

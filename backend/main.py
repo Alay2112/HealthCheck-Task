@@ -85,10 +85,14 @@ async def request_logs(request, call_next):
 
     duration = round((time.time()-start)*1000, 2)
 
-    api_logs.info(json.dumps({'level': 'INFO',
-                              'message': f'Request completed: {request.method}, {request.url.path}',
-                              'status_code': response.status_code,
-                              'duration_ms': duration}))
+    if response.status_code >= 500:
+        api_logs.error(json.dumps({'level': 'ERROR', 'message': f'Request Failed: {request.method}, {request.url.path}', 'status_code': response.status_code}))
+
+    elif response.status_code >= 400:
+        api_logs.warning(json.dumps({'level': 'WARNING', 'message': 'dependency error', 'path': request.url.path, 'status_code': response.status_code}))
+
+    else:
+        api_logs.info(json.dumps({'level': 'INFO', 'message': f'Request completed: {request.method}, {request.url.path}', 'status_code': response.status_code, 'duration_ms': duration}))
     return response
 
 
@@ -111,10 +115,7 @@ async def status_check(payload: StatusLogRequest, db: Session = Depends(get_db))
 
     if SIMULATE_DB_DOWN:
         failure_log.warning(json.dumps({"level": "WARNING", "message": "SIMULATE_DB_DOWN enabled"}))
-        raise HTTPException(
-            status_code=503,
-            detail="Simulate DB failure!"
-            )
+        raise HTTPException(status_code=503, detail="Simulate DB failure!")
 
     try:
         db.execute(text("SET statement_timeout = 1000"))

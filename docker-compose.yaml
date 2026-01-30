@@ -14,7 +14,7 @@ services:
     volumes:
     - pg_data:/var/lib/postgresql/data
     - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: always
+    restart: unless-stopped
   
   backend:
     image: backend-img
@@ -22,8 +22,7 @@ services:
     env_file:
     - ./backend/.env
     depends_on:
-      postgres:
-        condition: service_healthy
+    - postgres
     ports:
     - "8000:8000"
     healthcheck:
@@ -31,7 +30,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: always
+    restart: unless-stopped
 
   frontend:
     image: frontend-img
@@ -41,8 +40,7 @@ services:
     env_file:
     - ./frontend/.env
     depends_on:
-      backend:
-        condition: service_healthy
+    - backend
     restart: always
 
 volumes:

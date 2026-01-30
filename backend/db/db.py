@@ -1,6 +1,8 @@
 import os
-from sqlalchemy import create_engine
+import time
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.exc import OperationalError
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,12 +27,17 @@ Base = declarative_base()
 
 
 def get_db():
-    """
-    Database session dependency.
-    Creates a new database session for each request and closes it after.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    retries = 5
+
+    for attempt in range(retries):
+        db = SessionLocal()
+        try:
+            # lightweight probe
+            db.execute(text("SELECT 1"))
+            yield db
+            return
+        except OperationalError as e:
+            db.close()
+            if attempt == retries - 1:
+                raise
+            time.sleep(2)
